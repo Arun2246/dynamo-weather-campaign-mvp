@@ -1,13 +1,34 @@
 # DynaMo MVP — CoolSip Campaign Automation
+A Product Management take-home assignment for YOptima demonstrating workflow automation, explainable decision-making, and weather-driven digital campaign optimization.
 
-A working MVP of DynaMo: it pulls live weather for CoolSip's four launch
-cities, decides which of the three creatives should be running in each
-city, updates line item state, logs every transition, and gives CoolSip's
-team a dashboard to see (and override) what's running and why.
+DynaMo is an MVP that automatically activates the most relevant advertising creative for each city using live weather data. It continuously monitors weather conditions, evaluates campaign rules, updates campaign states, logs every decision, and provides marketers with complete visibility, manual override capabilities, and an audit trail.
 
-Built to the product/solution design doc as source of truth. See
-[`WRITEUP.md`](./WRITEUP.md) for the tradeoffs, edge cases, and the
-stretch-question answer.
+Built using the accompanying Product & Solution Design Document as the implementation source of truth. Additional design rationale, trade-offs, edge cases, and the stretch-question response are available in WRITEUP.md.
+
+# Key Features
+Automated weather-driven campaign switching
+Multi-city campaign management
+Rule-based decision engine
+Manual override with Resume Automation
+Decision history and audit trail
+API failure handling with graceful fallback
+Explainable automation through a single operations dashboard
+
+
+# Screenshots
+
+### Dashboard
+
+![Dashboard](assets/dashboard.png)
+
+### City Details
+
+![City Details](assets/city-details.png)
+
+### Manual Override
+
+![Manual Override](assets/manual-override.png)
+
 
 ## Stack
 
