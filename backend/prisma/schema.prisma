@@ -1,0 +1,91 @@
+// DynaMo MVP - Prisma schema
+// Implements the entity model from Section 6 of the design doc.
+//
+// Note on LineItem vs. the design doc's entity model:
+// The design doc's "LineItem" entity (city + activeCreative) is a per-city
+// concept, but the deliverable requirement (assessment brief) and the
+// provided line_items.csv both define a line item as one row per
+// creative+city pair (12 rows: 4 cities x 3 creatives), each independently
+// active/paused. This schema keeps that literal structure -- it's what lets
+// us "log every transition" per line item -- and layers the design doc's
+// per-city concepts (activeCreative, mode, health) on top via CityState.
+// At any moment, exactly one line item per city is ACTIVE; the others are
+// PAUSED. That active one *is* the design doc's "activeCreative".
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Campaign {
+  id        Int        @id @default(autoincrement())
+  name      String
+  status    String     @default("ACTIVE") // ACTIVE / PAUSED
+  lineItems LineItem[]
+  createdAt DateTime   @default(now())
+}
+
+model LineItem {
+  id             Int      @id @default(autoincrement())
+  lineItemId     String   @unique // e.g. LI-001, from starter CSV
+  campaignId     Int
+  campaign       Campaign @relation(fields: [campaignId], references: [id])
+  creativeId     String   // CR-HOT / CR-RAIN / CR-NORM
+  creativeName   String   // "Beat the heat", etc.
+  city           String
+  latitude       Float
+  longitude      Float
+  state          String   // ACTIVE / PAUSED
+  bid            Float
+  dailyBudget    Float
+  updatedAt      DateTime @updatedAt
+  createdAt      DateTime @default(now())
+
+  @@index([city])
+}
+
+// One row per city. Holds the automation mode, the last weather reading,
+// and the current decision -- everything the dashboard needs to render a
+// city's row without re-deriving it from line items every time.
+model CityState {
+  id                Int      @id @default(autoincrement())
+  city              String   @unique
+  mode              String   @default("AUTO") // AUTO / MANUAL
+  activeCreativeId  String?  // CR-HOT / CR-RAIN / CR-NORM
+  lastTemperature   Float?
+  lastRainfall      Float?
+  lastReason        String?
+  lastDecisionAt    DateTime?
+  lastSyncedAt      DateTime?
+  healthStatus      String   @default("UNKNOWN") // OK / STALE / ERROR / UNKNOWN
+  updatedAt         DateTime @updatedAt
+}
+
+model DecisionHistory {
+  id                Int      @id @default(autoincrement())
+  city              String
+  timestamp         DateTime @default(now())
+  temperature       Float?
+  rainfall          Float?
+  selectedCreativeId String
+  previousCreativeId String?
+  reason            String
+  triggerSource     String   // AUTO / MANUAL
+
+  @@index([city])
+  @@index([timestamp])
+}
+
+// Single-row table tracking overall sync health, per the design doc.
+model SystemStatus {
+  id                  Int      @id @default(autoincrement())
+  lastSuccessfulSync  DateTime?
+  provider            String   @default("open-meteo")
+  healthStatus        String   @default("UNKNOWN") // OK / STALE / ERROR / UNKNOWN
+  lastErrorMessage    String?
+  updatedAt           DateTime @updatedAt
+}
