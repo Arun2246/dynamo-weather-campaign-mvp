@@ -231,6 +231,45 @@ body {
   color: var(--muted);
 }
 
+.pill--updated {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Last Evaluation card */
+
+.last-eval {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  row-gap: 8px;
+  column-gap: 10px;
+  align-items: start;
+  font-size: 13px;
+  background: #faf9f6;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.last-eval__label {
+  color: var(--ink-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding-top: 2px;
+}
+
+.last-eval__value {
+  font-weight: 500;
+}
+
+.last-eval__value--reason {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
 /* Buttons */
 
 .btn {

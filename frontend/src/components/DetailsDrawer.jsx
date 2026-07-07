@@ -12,6 +12,24 @@ function formatDateTime(iso) {
   });
 }
 
+function formatTimeOnly(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// Derives whether the most recent scheduler evaluation for this city
+// resulted in a creative change, without any new persistence: applyDecision
+// (syncService.js) stamps lastDecisionAt and lastSyncedAt with the exact
+// same Date instance whenever a change occurs, and leaves lastDecisionAt
+// untouched otherwise. So the two timestamps match iff the last evaluation
+// changed the active creative.
+function getLastEvaluationOutcome(cityData) {
+  if (!cityData.lastSyncedAt) return null; // no evaluation has run yet
+  const synced = new Date(cityData.lastSyncedAt).getTime();
+  const decided = cityData.lastDecisionAt ? new Date(cityData.lastDecisionAt).getTime() : null;
+  return decided === synced;
+}
+
 export default function DetailsDrawer({ cityData, onClose, onChanged }) {
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -58,6 +76,8 @@ export default function DetailsDrawer({ cityData, onClose, onChanged }) {
       setBusy(false);
     }
   }
+
+  const wasUpdated = getLastEvaluationOutcome(cityData);
 
   return (
     <div className="drawer-backdrop" onClick={onClose}>
@@ -146,6 +166,40 @@ export default function DetailsDrawer({ cityData, onClose, onChanged }) {
               </button>
             ))}
           </div>
+        </section>
+
+        <section className="drawer__section">
+          <h3>Last evaluation</h3>
+          {cityData.lastSyncedAt ? (
+            <div className="last-eval">
+              <span className="last-eval__label">Time</span>
+              <span className="last-eval__value">{formatTimeOnly(cityData.lastSyncedAt)}</span>
+
+              <span className="last-eval__label">Weather</span>
+              <span className="last-eval__value">
+                🌡 {cityData.temperature != null ? `${cityData.temperature.toFixed(1)}°C` : "—"}
+                {"   "}
+                🌧 {cityData.rainfall != null ? `${cityData.rainfall.toFixed(1)} mm` : "—"}
+              </span>
+
+              <span className="last-eval__label">Decision</span>
+              <span className="last-eval__value">{creativeLabel(cityData.activeCreativeId)}</span>
+
+              <span className="last-eval__label">Outcome</span>
+              <span className={`pill ${wasUpdated ? "pill--updated" : "pill--ok"}`}>
+                {wasUpdated ? "Campaign updated" : "✓ No campaign update required"}
+              </span>
+
+              <span className="last-eval__label">Reason</span>
+              <span className="last-eval__value last-eval__value--reason">
+                {cityData.reason || "—"}
+              </span>
+            </div>
+          ) : (
+            <p className="drawer__hint">
+              Awaiting the first weather evaluation for {cityData.city}.
+            </p>
+          )}
         </section>
 
         <section className="drawer__section">
