@@ -25,10 +25,33 @@ async function main() {
   }
 
   const app = express();
-  app.use(cors());
-  app.use(express.json());
-  app.use("/", buildApiRouter(prisma));
 
+  app.use(cors());
+  
+  app.use(express.json());
+  
+  // Root endpoint for humans
+  
+  app.get("/", (req, res) => {
+  
+    res.json({
+  
+      service: "DynaMo Weather Campaign API",
+  
+      status: "running",
+  
+      version: "1.0.0",
+  
+      health: "/health",
+  
+      campaigns: "/campaigns",
+  
+    });
+  
+  });
+  
+  app.use("/", buildApiRouter(prisma));
+  
   app.get("/health", (req, res) => res.json({ ok: true }));
 
   app.listen(PORT, () => {
