@@ -5,6 +5,10 @@ DynaMo is an MVP that automatically activates the most relevant advertising crea
 
 Built using the accompanying Product & Solution Design Document as the implementation source of truth. Additional design rationale, trade-offs, edge cases, and the stretch-question response are available in WRITEUP.md.
 
+## Live Demo
+Frontend:
+https://dynamo-weather-campaign-mvp.vercel.app
+
 # Key Features
 Automated weather-driven campaign switching
 Multi-city campaign management
